@@ -1,0 +1,69 @@
+# Edge Container Registry - Fastly Compute Configuration
+manifest_version = 3
+name = "edge-container-registry"
+description = "OCI Distribution Spec v2 compliant container registry on Fastly Edge"
+authors = ["Edge Container Registry Contributors"]
+language = "go"
+
+# Leave empty for first deploy - Fastly will assign one
+# After first deploy, add your service ID here
+service_id = ""
+
+[scripts]
+build = "GOARCH=wasm GOOS=wasip1 go build -o bin/main.wasm ./src"
+
+# ============================================================================
+# LOCAL DEVELOPMENT CONFIGURATION
+# These settings are used when running `fastly compute serve`
+# ============================================================================
+
+[local_server]
+
+# KV Stores (local JSON files for testing)
+[local_server.kv_stores]
+  [local_server.kv_stores.oci-registry-manifests]
+  file = "kv_manifests.json"
+  format = "json"
+
+  [local_server.kv_stores.oci-registry-metadata]
+  file = "kv_metadata.json"
+  format = "json"
+
+# Secret Store (local file for development - DO NOT COMMIT real secrets!)
+[local_server.secret_stores]
+  [local_server.secret_stores.oci-registry-secrets]
+  file = "secret_store.json"
+  format = "json"
+
+# Backends
+[local_server.backends]
+  # CDN backend for cached blob reads (optional - configure your own)
+  [local_server.backends.cdn_backend]
+  url = "https://your-cdn-domain.example.com"
+
+  # Fastly Object Storage backend
+  # Update with your Object Storage endpoint (e.g., https://us-east.object.fastlystorage.app)
+  [local_server.backends.object_storage]
+  url = "https://YOUR_REGION.object.fastlystorage.app"
+
+# ============================================================================
+# PRODUCTION CONFIGURATION
+# Link these resources after creating them in Fastly
+# ============================================================================
+
+# [setup]
+# Uncomment and configure after creating resources:
+#
+# [setup.backends]
+#   [setup.backends.object_storage]
+#   address = "YOUR_REGION.object.fastlystorage.app"
+#   port = 443
+#   override_host = "YOUR_REGION.object.fastlystorage.app"
+#   use_ssl = true
+#
+# [setup.kv_stores]
+# "oci-registry-manifests" = { empty = true }
+# "oci-registry-metadata" = { empty = true }
+#
+# [setup.secret_stores]
+# "oci-registry-secrets" = {}
