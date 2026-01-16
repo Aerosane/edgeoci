@@ -1,0 +1,31 @@
+# Ignore build outputs
+bin/
+pkg/
+*.wasm
+
+# Go
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development
+*.local
+.env
+.env.local
+
+# Logs
+*.log
+
+# Secrets (never commit these!)
+secret_store.json
+*.pem
+*.key
